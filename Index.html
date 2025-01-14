@@ -1,0 +1,172 @@
+<html><head><base href="/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yahweh! - Insta Prayer</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @keyframes neon-flicker {
+      0%, 100% {
+        text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 40px #FFD700, 0 0 70px #FFD700, 0 0 80px #FFD700, 0 0 100px #FFD700;
+      }
+      50% {
+        text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 40px #FFD700, 0 0 30px #FFD700, 0 0 50px #FFD700;
+      }
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 95%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .header h1 {
+      color: #FFD700;
+      font-size: 2em;
+      animation: neon-flicker 1s infinite;
+      margin: 0 0 10px;
+    }
+    .prayer-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .prayer-form textarea, .prayer-form input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    .prayer-form button {
+      background-color: #FFD700;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s;
+    }
+    .prayer-form button:hover {
+      background-color: #e6ac00;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+    }
+    .play-button {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #FFD700;
+      border: none;
+      padding: 20px 40px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2em;
+      z-index: 1001;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .play-button:hover {
+      background-color: #e6ac00;
+    }
+  </style>
+</head>
+<body>
+  <audio id="background-audio">
+    <source src="https://example.com/yahweh.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const [activeTab, setActiveTab] = React.useState('compose');
+      const [audioPermission, setAudioPermission] = React.useState(false);
+
+      const sendPrayer = async event => {
+        event.preventDefault();
+        const prayerText = event.target.prayer.value;
+        const phoneNumber = event.target.phone.value;
+        if (prayerText.trim() === "" || phoneNumber.trim() === "") {
+          alert("Please enter both a prayer and your phone number.");
+          return;
+        }
+        
+        const composeEmail = (prayerText, phoneNumber) => {
+          const emailTo = encodeURIComponent('GodOfEverybody777@gmail.com');
+          const subject = encodeURIComponent('New Prayer Submission with Phone');
+          const body = encodeURIComponent(`Prayer: ${prayerText}\nPhone Number: ${phoneNumber}`);
+
+          window.location.href = `mailto:${emailTo}?subject=${subject}&body=${body}`;
+        };
+
+        try {
+          event.target.prayer.value = "";
+          event.target.phone.value = "";
+          alert("Your prayer has been sent!");
+          composeEmail(prayerText, phoneNumber);
+        } catch (error) {
+          console.error('Error sending prayer:', error);
+        }
+      };
+
+      const handleStartClick = () => {
+        setAudioPermission(true);
+      };
+
+      React.useEffect(() => {
+        const audio = document.getElementById('background-audio');
+        if (audioPermission) {
+          audio.play().catch(error => console.log("Audio playback error:", error));
+        }
+      }, [audioPermission]);
+
+      return <div>
+              {!audioPermission && <>
+                  <div className="overlay"></div>
+                  <button className="play-button" onClick={handleStartClick}>
+                      Click to Start Experience
+                  </button>
+                </>}
+              <div className="container">
+                  <div className="header">
+                      <h1>Yahweh! - Insta Prayer</h1>
+                  </div>
+                  <div className="prayer-form">
+                    <form onSubmit={sendPrayer}>
+                      <textarea id="prayer" name="prayer" placeholder="Enter your prayer here..." />
+                      <input type="text" id="phone" name="phone" placeholder="Enter your phone number..." />
+                      <button type="submit">Send Prayer</button>
+                    </form>
+                  </div>
+              </div>
+          </div>;
+    }
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
